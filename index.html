@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Dashboard & Resource Modules</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --container-color: #161b22;
+            --border-color: #30363d;
+            --accent-color: #58a6ff;
+            --text-main: #c9d1d9;
+            --text-muted: #8b949e;
+            --card-glow: rgba(88, 166, 255, 0.1);
+            --sidebar-width: 280px;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            margin: 0; padding: 0; display: flex; height: 100vh; overflow: hidden;
+        }
+        .sidebar {
+            width: var(--sidebar-width); background-color: var(--container-color);
+            border-right: 1px solid var(--border-color); display: flex; flex-direction: column; height: 100%;
+        }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid var(--border-color); }
+        .sidebar-header h2 { font-size: 18px; margin: 0 0 12px 0; color: #f0f6fc; }
+        .search-box {
+            width: 100%; padding: 10px; background: var(--bg-color); border: 1px solid var(--border-color);
+            border-radius: 6px; color: var(--text-main); font-size: 13px; box-sizing: border-box;
+        }
+        .sidebar-menu { flex: 1; overflow-y: auto; padding: 10px; }
+        .menu-item {
+            display: flex; align-items: center; padding: 12px 16px; border-radius: 6px;
+            cursor: pointer; margin-bottom: 4px; font-size: 13px; transition: background 0.2s;
+        }
+        .menu-item:hover { background: #21262d; color: var(--accent-color); }
+        .menu-item.active { background: #1f293d; color: var(--accent-color); border-left: 3px solid var(--accent-color); }
+        .main-content { flex: 1; display: flex; flex-direction: column; height: 100%; background: var(--bg-color); }
+        .control-bar {
+            background: var(--container-color); border-bottom: 1px solid var(--border-color);
+            padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; height: 40px;
+        }
+        .module-title { font-size: 14px; font-weight: 600; color: #f0f6fc; }
+        .btn-group { display: flex; gap: 8px; }
+        .btn {
+            background: #21262d; border: 1px solid var(--border-color); color: var(--text-main);
+            padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 13px;
+        }
+        .btn:hover { border-color: var(--accent-color); color: #fff; }
+        .viewport { flex: 1; background: #161b22; position: relative; display: flex; align-items: center; justify-content: center; }
+        iframe { width: 100%; height: 100%; border: none; background: #000; display: none; }
+        
+        .preview-fallback {
+            display: block; text-align: center; padding: 40px; max-width: 500px;
+        }
+        .preview-fallback h3 { color: #f0f6fc; margin: 0 0 10px 0; font-size: 18px; }
+        .preview-fallback p { color: var(--text-muted); font-size: 13px; margin: 0 0 20px 0; line-height: 1.6; }
+        
+        .ad-footer {
+            height: 90px; background: var(--container-color); border-top: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>System Modules</h2>
+            <input type="text" id="moduleSearch" class="search-box" placeholder="Search arrays...">
+        </div>
+        <div class="sidebar-menu" id="menuList">
+            <div class="menu-item active" onclick="loadModule('Video Search Portal', 'https://google.com', true)">Video Search Portal</div>
+            <div class="menu-item" onclick="loadModule('Skyline GP v24.45', 'index (3).html', false)">Skyline GP v24.45</div>
+            <!-- EXACT NAME MATCH TARGET FOR YOUR EXTRACTED VERSION -->
+            <div class="menu-item" onclick="loadModule('Stormfront.io Network', 'stormfront-io-v61 (4).html', false)">Stormfront.io Network</div>
+            <div class="menu-item" onclick="loadModule('Retro Bowl Classic', 'retro-bowl.html', false)">Retro Bowl Classic</div>
+            <div class="menu-item" onclick="loadModule('Slope Precision Engine', 'slope.html', false)">Slope Precision Engine</div>
+            <div class="menu-item" onclick="loadModule('1v1.LOL Arena Matrix', '1v1-lol.html', false)">1v1.LOL Arena Matrix</div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="control-bar">
+            <div class="module-title" id="activeTitle">Video Search Portal</div>
+            <div class="btn-group">
+                <button class="btn" onclick="hardReloadModule()">Reload Module</button>
+                <button class="btn" onclick="toggleFullscreen()">Fullscreen Mode</button>
+            </div>
+        </div>
+        <div class="viewport" id="viewportContainer">
+            <iframe id="mainEngineFrame" src="" allow="autoplay; fullscreen; keyboard; picture-in-picture"></iframe>
+            
+            <div class="preview-fallback" id="fallbackContent">
+                <h3>Video Portal Active</h3>
+                <p>Media stream interface isolated securely. Click the bypass trigger below to open the unblocked video portal search tab smoothly.</p>
+                <button class="btn" id="fallbackBtn" onclick="openBypassWindow()">Launch Direct Link</button>
+            </div>
+        </div>
+        <div class="ad-footer">
+            <div id="adsterraBannerSlot" style="color: var(--text-muted); font-size: 12px;">System Network Container Secure</div>
+        </div>
+    </div>
+
+    <script>
+        const menuList = document.getElementById('menuList');
+        const searchInput = document.getElementById('moduleSearch');
+        const mainFrame = document.getElementById('mainEngineFrame');
+        const activeTitle = document.getElementById('activeTitle');
+        const viewport = document.getElementById('viewportContainer');
+        const fallbackContent = document.getElementById('fallbackContent');
+        let currentActiveUrl = 'https://google.com';
+
+        for (let i = 7; i <= 52; i++) {
+            const item = document.createElement('div');
+            item.className = 'menu-item';
+            item.setAttribute('onclick', `loadModule('Data Analytics Module ${String(i).padStart(2, '0')}', 'modules/game${i}/index.html', false)`);
+            item.innerHTML = `Analytics Matrix Array ${String(i).padStart(2, '0')}`;
+            menuList.appendChild(item);
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.style.display = item.textContent.toLowerCase().includes(query) ? 'flex' : 'none';
+            });
+        });
+
+        function loadModule(title, url, isStream) {
+            activeTitle.textContent = title;
+            currentActiveUrl = url;
+            
+            if (isStream) {
+                mainFrame.style.display = 'none';
+                mainFrame.src = '';
+                fallbackContent.style.display = 'block';
+            } else {
+                mainFrame.style.display = 'block';
+                fallbackContent.style.display = 'none';
+                mainFrame.src = url;
+            }
+            
+            document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+            
+            const items = document.querySelectorAll('.menu-item');
+            items.forEach(item => {
+                if (item.textContent === title) {
+                    item.classList.add('active');
+                }
+            });
+        }
+
+        function openBypassWindow() {
+            window.open(currentActiveUrl, '_blank');
+        }
+
+        function hardReloadModule() {
+            if (mainFrame.style.display !== 'none') {
+                const currentSrc = mainFrame.src;
+                mainFrame.src = '';
+                setTimeout(() => { mainFrame.src = currentSrc; }, 50);
+            }
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                viewport.requestFullscreen().catch(err => alert(`Error: ${err.message}`));
+            } else {
+                document.exitFullscreen();
+            }
+        }
+    </script>
+</body>
+</html>
