@@ -51,10 +51,12 @@
         }
         .btn:hover { border-color: var(--accent-color); color: #fff; }
         .viewport { flex: 1; background: #161b22; position: relative; display: flex; align-items: center; justify-content: center; }
-        iframe { width: 100%; height: 100%; border: none; background: #000; display: none; }
+        
+        /* FIXED RENDER PARAMETER MATRIX */
+        iframe { width: 100%; height: 100%; border: none; background: #000; display: block; }
         
         .preview-fallback {
-            display: block; text-align: center; padding: 40px; max-width: 500px;
+            display: none; text-align: center; padding: 40px; max-width: 500px;
         }
         .preview-fallback h3 { color: #f0f6fc; margin: 0 0 10px 0; font-size: 18px; }
         .preview-fallback p { color: var(--text-muted); font-size: 13px; margin: 0 0 20px 0; line-height: 1.6; }
@@ -75,7 +77,6 @@
         <div class="sidebar-menu" id="menuList">
             <div class="menu-item active" onclick="loadModule('Video Search Portal', 'https://google.com', true)">Video Search Portal</div>
             <div class="menu-item" onclick="loadModule('Skyline GP v24.45', 'index (3).html', false)">Skyline GP v24.45</div>
-            <!-- EXACT NAME MATCH TARGET FOR YOUR EXTRACTED VERSION -->
             <div class="menu-item" onclick="loadModule('Stormfront.io Network', 'stormfront-io-v61 (4).html', false)">Stormfront.io Network</div>
             <div class="menu-item" onclick="loadModule('Retro Bowl Classic', 'retro-bowl.html', false)">Retro Bowl Classic</div>
             <div class="menu-item" onclick="loadModule('Slope Precision Engine', 'slope.html', false)">Slope Precision Engine</div>
@@ -92,7 +93,7 @@
             </div>
         </div>
         <div class="viewport" id="viewportContainer">
-            <iframe id="mainEngineFrame" src="" allow="autoplay; fullscreen; keyboard; picture-in-picture"></iframe>
+            <iframe id="mainEngineFrame" src="https://google.com" allow="autoplay; fullscreen; keyboard; picture-in-picture"></iframe>
             
             <div class="preview-fallback" id="fallbackContent">
                 <h3>Video Portal Active</h3>
